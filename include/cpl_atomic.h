@@ -21,6 +21,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/*
+ * C Primitives Library. Cross-platform atomic interface.
+ */
+
 #ifndef _CPL_ATOMIC_H_
 #define _CPL_ATOMIC_H_
 

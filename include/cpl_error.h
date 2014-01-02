@@ -21,6 +21,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/*
+ * C Primitives Library. Result (error) codes.
+ */
+
 #ifndef _CPL_ERROR_H_
 #define _CPL_ERROR_H_
 

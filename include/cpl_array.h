@@ -30,7 +30,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "cpl_region.h"
+#include <cpl_region.h>
 
 #define _CPL_DEFAULT_ARRAY_SIZE     64
 

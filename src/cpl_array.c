@@ -41,17 +41,44 @@ cpl_array_ref cpl_array_create(size_t sz, size_t nreserv)
     return a;
 }
 
+cpl_array_ref cpl_array_copy(cpl_array_ref __restrict o)
+{
+    cpl_array_ref a = cpl_array_create(o->szelem, o->region.alloc/o->szelem);
+    if(a)
+    {
+        cpl_region_append_region(&a->region, &o->region);
+        a->count = o->count;
+    }
+    return a;
+}
+
+void cpl_array_destroy(cpl_array_ref __restrict a)
+{
+    cpl_region_deinit(&a->region);
+    free(a);
+}
+
+void* cpl_array_get_p(cpl_array_ref __restrict a, size_t i)
+{
+    if(i * a->szelem < a->region.alloc)
+        return cpl_array_data(a, char) + i * a->szelem;
+    return 0;
+}
 
 int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz)
 {
+    int res = _CPL_OK;
     /* Size of buffer should be at least size of an element */
-    if(sz < a->szelem) return _CPL_INVALID_ARG;
+    if(sz < a->szelem) goto _Lexit;
     
     /* get new count of elements in array */
     size_t count = sz / a->szelem;
     
-    cpl_region_append_data(&a->region, p, count * a->szelem);
+    int result = cpl_region_append_data(&a->region, p, count * a->szelem);
+    if(result != _CPL_OK) goto _Lexit;
+    
     a->count += count;
     
-    return _CPL_OK;
+_Lexit:
+    return res;
 }

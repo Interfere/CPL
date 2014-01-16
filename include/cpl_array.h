@@ -53,23 +53,14 @@ cpl_array_ref cpl_array_create(size_t sz, size_t nreserv);
 #define cpl_array_create_sz(sz)         cpl_array_create(sz, _CPL_DEFAULT_ARRAY_SIZE)
 
 /*
- * Create an array with copy of other array.
+ * Copies an array.
  */
-static __inline__ cpl_array_ref cpl_array_create_copy(cpl_array_ref __restrict o)
-{
-    cpl_array_ref a = cpl_array_create(o->szelem, o->region.alloc/o->szelem);
-    if(a)
-    {
-        cpl_region_append_region(&a->region, &o->region);
-        a->count = o->count;
-    }
-    return a;
-}
+cpl_array_ref cpl_array_copy(cpl_array_ref __restrict o);
 
 /*
  * Destroys an array.
  */
-#define cpl_array_destroy(a)            cpl_region_deinit(&(a)->region);free(a)
+void cpl_array_destroy(cpl_array_ref __restrict a);
 
 /*
  * Count of elements in array
@@ -84,12 +75,7 @@ static __inline__ cpl_array_ref cpl_array_create_copy(cpl_array_ref __restrict o
 /*
  * Get access of an element.
  */
-static __inline__ void* cpl_array_get_p(cpl_array_ref __restrict a, size_t i)
-{
-    if(i * a->szelem < a->region.alloc)
-        return cpl_array_data(a, char) + i * a->szelem;
-    return 0;
-}
+void* cpl_array_get_p(cpl_array_ref __restrict a, size_t i);
 #define cpl_array_get(a, i, type)       (*(type*)cpl_array_get_p(a, i))
 
 /*

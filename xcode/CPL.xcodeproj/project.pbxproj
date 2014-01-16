@@ -51,7 +51,7 @@
 				71F454F31875DBD400FCBA58 /* cpl_region.h */,
 			);
 			name = include;
-			path = ../include;
+			path = ../include/cpl;
 			sourceTree = "<group>";
 		};
 		71F454F41875DBD400FCBA58 /* src */ = {
@@ -339,6 +339,7 @@
 				71F455011875DC5C00FCBA58 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		71F4550C1875DCF600FCBA58 /* Build configuration list for PBXNativeTarget "cpl_ios" */ = {
 			isa = XCConfigurationList;

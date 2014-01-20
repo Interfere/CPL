@@ -40,10 +40,11 @@ struct cpl_array
     size_t          count;      /* count of elements */
     cpl_region_t    region;
 };
+typedef struct cpl_array cpl_array_t;
 typedef struct cpl_array* cpl_array_ref;
 
 /*
- * Creates an empty array with space reserved for _count_ items of size _sz_.
+ * Creates an empty array with space reserved for _nreserv_ items of size _sz_.
  */
 cpl_array_ref cpl_array_create(size_t sz, size_t nreserv);
 
@@ -51,6 +52,16 @@ cpl_array_ref cpl_array_create(size_t sz, size_t nreserv);
  * Creates an empty array for items sizeof _sz_
  */
 #define cpl_array_create_sz(sz)         cpl_array_create(sz, _CPL_DEFAULT_ARRAY_SIZE)
+
+/*
+ * Initialize stack-allocated array with _nreserv_ items of size _sz_.
+ */
+int cpl_array_init(cpl_array_ref a, size_t sz, size_t nreserv);
+
+/*
+ * Deinitialize stack-allocated array.
+ */
+#define cpl_array_deinit(a)             cpl_region_deinit(&(a)->region)
 
 /*
  * Copies an array.

@@ -41,6 +41,17 @@ cpl_array_ref cpl_array_create(size_t sz, size_t nreserv)
     return a;
 }
 
+int cpl_array_init(cpl_array_ref a, size_t sz, size_t nreserv)
+{
+    int res = cpl_region_init(&a->region, sz * nreserv);
+    if(res == _CPL_OK)
+    {
+        a->szelem = sz;
+        a->count = 0;
+    }
+    return res;
+}
+
 cpl_array_ref cpl_array_copy(cpl_array_ref __restrict o)
 {
     cpl_array_ref a = cpl_array_create(o->szelem, o->region.alloc/o->szelem);

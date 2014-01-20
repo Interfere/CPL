@@ -50,5 +50,6 @@ int cpl_region_init(cpl_region_ref __restrict r, size_t sz);
 int cpl_region_append_data(cpl_region_ref __restrict r, const void* __restrict data, size_t sz);
 #define cpl_region_append_region(r, o) cpl_region_append_data(r, (o)->data, (o)->offset)
 
+int cpl_region_resize(cpl_region_ref __restrict r, size_t sz);
 
 #endif // _CPL_REGION_H_

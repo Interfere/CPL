@@ -95,4 +95,20 @@ void* cpl_array_get_p(cpl_array_ref __restrict a, size_t i);
 int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz);
 #define cpl_array_push_back(a, v)       cpl_array_push_back_p(a, &(v), sizeof(v))
 
+/*
+ * Delete last element.
+ */
+#define cpl_array_pop_back(a)           ((a)->count-=1)
+
+/*
+ * Access last element.
+ */
+void* cpl_array_back_p(cpl_array_ref __restrict a);
+#define cpl_array_back(a, type)         (*(type*)cpl_array_back_p(a))
+
+/*
+ * Change size of an array.
+ */
+int cpl_array_resize(cpl_array_ref __restrict a, size_t sz);
+
 #endif // _CPL_ARRAY_H_

@@ -29,6 +29,30 @@
 
 #include "cpl_error.h"
 
+static size_t _cpl_p2(size_t in)
+{
+    in |= (in >> 1);
+    in |= (in >> 2);
+    in |= (in >> 4);
+    in |= (in >> 8);
+    in |= (in >> 16);
+    in -= (in >> 1);
+    return in;
+}
+
+static inline int _cpl_resize_up(cpl_region_ref __restrict r, size_t sz)
+{
+    size_t alloc = _cpl_p2(sz);
+    void *ptr = realloc(r->data, alloc);
+    if(!ptr)
+    {
+        return _CPL_NOMEM;
+    }
+    r->data = ptr;
+    r->alloc = alloc;
+    return _CPL_OK;
+}
+
 cpl_region_ref cpl_region_create(size_t sz)
 {
     cpl_region_ref r = (cpl_region_ref)malloc(sizeof(cpl_region_t));
@@ -48,12 +72,7 @@ int cpl_region_init(cpl_region_ref __restrict r, size_t sz)
     assert(r);
     if(sz > 64)
     {
-        sz |= (sz >> 1);
-        sz |= (sz >> 2);
-        sz |= (sz >> 4);
-        sz |= (sz >> 8);
-        sz |= (sz >> 16);
-        sz -= (sz >> 1);
+        _cpl_p2(sz);
     }
     else
     {
@@ -85,17 +104,29 @@ int cpl_region_append_data(cpl_region_ref __restrict r, const void* __restrict d
     
     if(alloc > r->alloc)
     {
-        void *ptr = realloc(r->data, alloc);
-        if(!ptr)
+        int res = _cpl_resize_up(r, alloc);
+        if(res)
         {
-            return _CPL_NOMEM;
+            return res;
         }
-        r->data = ptr;
-        r->alloc = alloc;
     }
     
     memcpy((char*)r->data + r->offset, data, sz);
     r->offset += sz;
     
+    return _CPL_OK;
+}
+
+int cpl_region_resize(cpl_region_ref __restrict r, size_t sz)
+{
+    size_t alloc = _cpl_p2(sz);
+    void *ptr = realloc(r->data, alloc);
+    if(!ptr)
+    {
+        return _CPL_NOMEM;
+    }
+    r->data = ptr;
+    r->alloc = alloc;
+    r->offset = (r->offset > alloc)?alloc:r->offset;
     return _CPL_OK;
 }

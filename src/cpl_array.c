@@ -76,6 +76,22 @@ void* cpl_array_get_p(cpl_array_ref __restrict a, size_t i)
     return 0;
 }
 
+int cpl_array_resize(cpl_array_ref __restrict a, size_t sz)
+{
+    size_t alloc = sz * a->szelem;
+    if(alloc > a->region.alloc)
+    {
+        cpl_region_resize(&a->region, alloc);
+    }
+    a->count = sz;
+    return _CPL_OK;
+}
+
+void* cpl_array_back_p(cpl_array_ref __restrict a)
+{
+    return cpl_array_get_p(a, cpl_array_count(a));
+}
+
 int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz)
 {
     int res = _CPL_OK;

@@ -89,7 +89,7 @@ int cpl_array_resize(cpl_array_ref __restrict a, size_t sz)
 
 void* cpl_array_back_p(cpl_array_ref __restrict a)
 {
-    return cpl_array_get_p(a, cpl_array_count(a));
+    return cpl_array_get_p(a, cpl_array_count(a)-1);
 }
 
 int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz)

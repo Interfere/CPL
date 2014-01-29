@@ -87,6 +87,12 @@ int cpl_array_resize(cpl_array_ref __restrict a, size_t sz)
     return _CPL_OK;
 }
 
+void cpl_array_clear(cpl_array_ref __restrict a)
+{
+    a->count = 0;
+    a->region.offset = 0;
+}
+
 void* cpl_array_back_p(cpl_array_ref __restrict a)
 {
     return cpl_array_get_p(a, cpl_array_count(a)-1);

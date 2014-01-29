@@ -79,6 +79,11 @@ void cpl_array_destroy(cpl_array_ref __restrict a);
 #define cpl_array_count(a)              ((a)->count)
 
 /*
+ * Clears content of an array
+ */
+void cpl_array_clear(cpl_array_ref __restrict a);
+
+/*
  * Get raw pointer of elements.
  */
 #define cpl_array_data(a, type)         (type *)((a)->region.data)

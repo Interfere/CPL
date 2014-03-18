@@ -127,6 +127,6 @@ void cpl_allocator_destroy_pool(cpl_allocator_ref allocator)
 {
     assert(allocator != cpl_allocator_get_default());
     struct cpl_pool_allocator* pPoolAllocator = (struct cpl_pool_allocator *)allocator;
-    void* ptr = (char *)pPoolAllocator - pPoolAllocator->poolSize;
-    free(ptr);
+    int rc = munmap(pPoolAllocator->pool, pPoolAllocator->poolSize + sizeof(struct cpl_pool_allocator));
+    assert(rc == 0);
 }

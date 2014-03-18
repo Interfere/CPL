@@ -24,7 +24,14 @@
 #include "cpl_allocator.h"
 
 #include <assert.h>
+#include <sys/mman.h>
 #include "cpl_list.h"
+
+#ifndef MAP_ANONYMOUS
+#   ifdef MAP_ANON
+#       define MAP_ANONYMOUS MAP_ANON
+#   endif
+#endif
 
 /********************** Default Allocator Implementation **********************/
 struct cpl_allocator
@@ -86,26 +93,14 @@ void cpl_allocator_free(cpl_allocator_ref allocator, void* ptr)
     return allocator->xFree(allocator, ptr);
 }
 
-cpl_allocator_ref cpl_allocator_create_pool(size_t chunkSize, int nChunks, int align)
+cpl_allocator_ref cpl_allocator_create_pool(size_t chunkSize, int nChunks)
 {
     assert(chunkSize < 8192 && chunkSize > 32);
     
     size_t poolSize = chunkSize * nChunks;
-    void* poolBuffer = 0;
-    if(align)
-    {
-        int res = posix_memalign(&poolBuffer, align, poolSize + sizeof(struct cpl_pool_allocator));
-        if(res)
-        {
-            return poolBuffer = 0;
-        }
-    }
-    else
-    {
-        poolBuffer = malloc(poolSize + sizeof(struct cpl_pool_allocator));
-    }
+    void* poolBuffer = mmap(0, poolSize + sizeof(struct cpl_pool_allocator), PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
     
-    if(!poolBuffer)
+    if(poolBuffer == MAP_FAILED)
     {
         return 0;
     }

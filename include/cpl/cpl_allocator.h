@@ -44,7 +44,7 @@ cpl_allocator_ref cpl_allocator_get_default();
 /**
  * Constructor and Destructor for pool allocator.
  */
-cpl_allocator_ref cpl_allocator_create_pool(size_t chunkSize, int nChunks, int align);
+cpl_allocator_ref cpl_allocator_create_pool(size_t chunkSize, int nChunks);
 void cpl_allocator_destroy_pool(cpl_allocator_ref);
 
 /**

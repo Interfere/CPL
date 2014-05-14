@@ -76,6 +76,18 @@ static void cpl_pool_free(struct cpl_allocator* pAllocator, void* ptr)
     cpl_slist_add(&pPoolAllocator->list, ptr);
 }
 
+/********************* Doug Lea's Allocator routines  *************************/
+struct cpl_dl_allocator
+{
+    void*   (*xAllocate)(struct cpl_allocator*, size_t);
+    void    (*xFree)(struct cpl_allocator*, void* ptr);
+    /* The Heap */
+    void*   start_addr;
+    void*   end_addr;
+    void*   max_addr;
+    cpl_slist_ref head;
+};
+
 /*********************** Public Allocator routines  ***************************/
 cpl_allocator_ref cpl_allocator_get_default()
 {
@@ -128,5 +140,43 @@ void cpl_allocator_destroy_pool(cpl_allocator_ref allocator)
     assert(allocator != cpl_allocator_get_default());
     struct cpl_pool_allocator* pPoolAllocator = (struct cpl_pool_allocator *)allocator;
     int rc = munmap(pPoolAllocator->pool, pPoolAllocator->poolSize + sizeof(struct cpl_pool_allocator));
+    assert(rc == 0);
+}
+
+cpl_allocator_ref cpl_allocator_create_dl(size_t max_size)
+{
+    /* align to page size */
+    if(max_size & 0xFFF)
+    {
+        max_size &= 0x1000;
+        max_size += 0x1000;
+    }
+    
+    /* reserve pages */
+    char* addr = mmap(0, max_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if(addr == MAP_FAILED)
+    {
+        /* failed to map */
+        return 0;
+    }
+    
+    /* place allocator struct right after the heap and setup fields */
+    struct cpl_dl_allocator* dl_allocator = (struct cpl_dl_allocator *)addr;
+    dl_allocator->start_addr = addr;
+    dl_allocator->end_addr = addr + ((max_size >= 0x10000)?0x10000:max_size);
+    dl_allocator->max_addr = addr + max_size;
+    
+    // Temporarily set the head pointer to 0
+    dl_allocator->head = 0;
+    
+    return (cpl_allocator_ref)dl_allocator;
+}
+
+void cpl_allocator_destroy_dl(cpl_allocator_ref allocator)
+{
+    assert(allocator != cpl_allocator_get_default());
+    struct cpl_dl_allocator* dl_allocator = (struct cpl_dl_allocator *)allocator;
+    size_t max_size = (char*)dl_allocator->max_addr - (char*)dl_allocator->start_addr;
+    int rc = munmap(dl_allocator->start_addr, max_size + sizeof(struct cpl_dl_allocator));
     assert(rc == 0);
 }

@@ -48,6 +48,12 @@ cpl_allocator_ref cpl_allocator_create_pool(size_t chunkSize, int nChunks);
 void cpl_allocator_destroy_pool(cpl_allocator_ref);
 
 /**
+ * Constructor and Destructor for Doug Lea's allocator.
+ */
+cpl_allocator_ref cpl_allocator_create_dl(size_t max_size);
+void cpl_allocator_destroy_dl(cpl_allocator_ref);
+
+/**
  * Alloc() and Free() routines that encapsulates allocator-related internals.
  */
 void* cpl_allocator_allocate(cpl_allocator_ref, size_t);

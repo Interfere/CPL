@@ -177,6 +177,6 @@ void cpl_allocator_destroy_dl(cpl_allocator_ref allocator)
     assert(allocator != cpl_allocator_get_default());
     struct cpl_dl_allocator* dl_allocator = (struct cpl_dl_allocator *)allocator;
     size_t max_size = (char*)dl_allocator->max_addr - (char*)dl_allocator->start_addr;
-    int rc = munmap(dl_allocator->start_addr, max_size + sizeof(struct cpl_dl_allocator));
+    int rc = munmap(dl_allocator->start_addr, max_size);
     assert(rc == 0);
 }

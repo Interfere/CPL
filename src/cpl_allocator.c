@@ -78,9 +78,31 @@ static void cpl_pool_free(struct cpl_allocator* pAllocator, void* ptr)
 }
 
 /********************* Doug Lea's Allocator routines  *************************/
-#define DL_PINUSE_BIT          ((size_t)0x1)
-#define DL_CINUSE_BIT          ((size_t)0x2)
 
+/* flags */
+#define DL_PINUSE_BIT           ((size_t)0x1)
+#define DL_CINUSE_BIT           ((size_t)0x2)
+#define DL_RESERV_BIT           ((size_t)0x4)
+#define DL_INUSE_BITS           (DL_CINUSE_BIT | DL_PINUSE_BIT)
+#define DL_FLAGS_MASK           (DL_INUSE_BITS | DL_RESERV_BIT)
+
+#define dl_pinuse(c)            ((c)->head & DL_PINUSE_BIT)
+#define dl_cinuse(c)            ((c)->head & DL_CINUSE_BIT)
+
+#define set_pinuse(c)           ((c)->head |= PINUSE_BIT)
+#define clear_pinuse(c)         ((c)->head &= ~PINUSE_BIT)
+
+/* chunk sizes */
+#define DL_CHUNK_SIZE           (sizeof(struct dl_chunk))
+#define DL_CHUNK_OVERHEAD       (2 * sizeof(size_t))
+
+#define dl_pad_request(s)       (((s) + DL_CHUNK_OVERHEAD + DL_FLAGS_MASK) & ~DL_FLAGS_MASK)
+#define request2size(s)         ((s) < DL_CHUNK_SIZE ? DL_CHUNK_SIZE : dl_pad_request(s))
+
+/* header <-> body */
+#define dl_size(c)              ((c)->head & ~(DL_FLAGS_MASK))
+#define chunk2ptr(c)            ((void*)&((c)->list))
+#define ptr2chunk(ptr)          ((dl_chunk*)((char*)(ptr) - offsetof(dl_chunk, list)))
 
 struct cpl_dl_allocator
 {

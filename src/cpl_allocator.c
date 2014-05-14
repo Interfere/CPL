@@ -24,6 +24,7 @@
 #include "cpl_allocator.h"
 
 #include <assert.h>
+#include <stddef.h>
 #include <sys/mman.h>
 #include "cpl_list.h"
 
@@ -77,6 +78,10 @@ static void cpl_pool_free(struct cpl_allocator* pAllocator, void* ptr)
 }
 
 /********************* Doug Lea's Allocator routines  *************************/
+#define DL_PINUSE_BIT          ((size_t)0x1)
+#define DL_CINUSE_BIT          ((size_t)0x2)
+
+
 struct cpl_dl_allocator
 {
     void*   (*xAllocate)(struct cpl_allocator*, size_t);
@@ -87,6 +92,36 @@ struct cpl_dl_allocator
     void*   max_addr;
     cpl_slist_ref head;
 };
+
+struct dl_chunk
+{
+    size_t  prev_foot;
+    size_t  head;
+    struct cpl_slist list;
+};
+typedef struct dl_chunk dl_chunk;
+
+void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* addr, size_t max_size)
+{
+    /* calculate initial size of the heap */
+    size_t init_size = (max_size >= 0x10000)?0x10000:max_size;
+    
+    /* setup allocator */
+    dl_allocator->start_addr = addr;
+    dl_allocator->end_addr = addr + init_size;
+    dl_allocator->max_addr = addr + max_size;
+    
+    /* setup initial chunk */
+    init_size -= sizeof(struct cpl_dl_allocator);
+    dl_chunk* chunk = (dl_chunk*)&(dl_allocator->head);
+    chunk->head = init_size | DL_PINUSE_BIT;
+    size_t* footer = (size_t*)((char*)dl_allocator->end_addr - sizeof(size_t));
+    *footer = init_size;
+    
+    /* setup linked list of chunks */
+    dl_allocator->head = (struct cpl_slist*)&(chunk->list);
+    chunk->list.prev = chunk->list.next = dl_allocator->head;
+}
 
 /*********************** Public Allocator routines  ***************************/
 cpl_allocator_ref cpl_allocator_get_default()
@@ -162,12 +197,7 @@ cpl_allocator_ref cpl_allocator_create_dl(size_t max_size)
     
     /* place allocator struct right after the heap and setup fields */
     struct cpl_dl_allocator* dl_allocator = (struct cpl_dl_allocator *)addr;
-    dl_allocator->start_addr = addr;
-    dl_allocator->end_addr = addr + ((max_size >= 0x10000)?0x10000:max_size);
-    dl_allocator->max_addr = addr + max_size;
-    
-    // Temporarily set the head pointer to 0
-    dl_allocator->head = 0;
+    cpl_dl_allocator_init(dl_allocator, addr, max_size);
     
     return (cpl_allocator_ref)dl_allocator;
 }

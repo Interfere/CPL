@@ -86,11 +86,18 @@ static void cpl_pool_free(struct cpl_allocator* pAllocator, void* ptr)
 #define DL_INUSE_BITS           (DL_CINUSE_BIT | DL_PINUSE_BIT)
 #define DL_FLAGS_MASK           (DL_INUSE_BITS | DL_RESERV_BIT)
 
+/* calculation helpers */
+#define dl_chunk_plus_offset(c, o) ((dl_chunk *)((char *)(c) + (o)))
+
+/* flag getters */
 #define dl_pinuse(c)            ((c)->head & DL_PINUSE_BIT)
 #define dl_cinuse(c)            ((c)->head & DL_CINUSE_BIT)
 
-#define set_pinuse(c)           ((c)->head |= PINUSE_BIT)
-#define clear_pinuse(c)         ((c)->head &= ~PINUSE_BIT)
+/* flag setters */
+#define set_pinuse(c)           ((c)->head |= DL_PINUSE_BIT)
+#define clear_pinuse(c)         ((c)->head &= ~DL_PINUSE_BIT)
+#define set_inuse(c, s)         ((c)->head = dl_pinuse(c) | DL_CINUSE_BIT | (s)), \
+                                set_pinuse(dl_chunk_plus_offset(c, s))
 
 /* chunk sizes */
 #define DL_CHUNK_SIZE           (sizeof(struct dl_chunk))
@@ -122,28 +129,6 @@ struct dl_chunk
     cpl_dlist_t list;
 };
 typedef struct dl_chunk dl_chunk;
-
-static void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* addr, size_t max_size)
-{
-    /* calculate initial size of the heap */
-    size_t init_size = (max_size >= 0x10000)?0x10000:max_size;
-    
-    /* setup allocator */
-    dl_allocator->start_addr = addr;
-    dl_allocator->end_addr = addr + init_size;
-    dl_allocator->max_addr = addr + max_size;
-    
-    /* setup initial chunk */
-    init_size -= sizeof(struct cpl_dl_allocator);
-    dl_chunk* chunk = (dl_chunk*)&(dl_allocator->head);
-    chunk->head = init_size | DL_PINUSE_BIT;
-    size_t* footer = (size_t*)((char*)dl_allocator->end_addr - sizeof(size_t));
-    *footer = init_size;
-    
-    /* setup linked list of chunks */
-    dl_allocator->head.next = (struct cpl_dlist *)&(chunk->list);
-    chunk->list.prev = chunk->list.next = &(dl_allocator->head);
-}
 
 static dl_chunk* dl_find_smallest_chunk(struct cpl_dl_allocator* dl_allocator, size_t sz)
 {
@@ -187,6 +172,61 @@ static void dl_insert_chunk(struct cpl_dl_allocator* dl_allocator, dl_chunk* chu
 static void dl_remove_chunk(dl_chunk* chunk)
 {
     cpl_dlist_del(&(chunk->list));
+}
+
+static void* cpl_dl_malloc(struct cpl_allocator* allocator, size_t sz)
+{
+    struct cpl_dl_allocator* dl_allocator = (struct cpl_dl_allocator *)allocator;
+    
+    size_t chunksize = request2size(sz);
+    dl_chunk *hole = dl_find_smallest_chunk(dl_allocator, chunksize);
+    if(!hole)
+    {
+        // TODO:
+    }
+    assert( dl_size(hole) >= chunksize);
+    
+    dl_remove_chunk(hole);
+    if(dl_size(hole) >= chunksize + DL_CHUNK_SIZE)
+    {
+        size_t new_size = dl_size(hole) - chunksize;
+        dl_chunk* new_chunk = dl_chunk_plus_offset(hole, chunksize);
+        new_chunk->head = new_size;
+        dl_insert_chunk(dl_allocator, new_chunk);
+    }
+    else
+    {
+        chunksize = dl_size(hole);
+    }
+    
+    set_inuse(hole, chunksize);
+    
+    return chunk2ptr(hole);
+    
+_Lfailure:
+    return 0;
+}
+
+static void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* addr, size_t max_size)
+{
+    /* calculate initial size of the heap */
+    size_t init_size = (max_size >= 0x10000)?0x10000:max_size;
+    
+    /* setup allocator */
+    dl_allocator->start_addr = addr;
+    dl_allocator->end_addr = addr + init_size;
+    dl_allocator->max_addr = addr + max_size;
+    
+    /* setup initial chunk */
+    init_size -= sizeof(struct cpl_dl_allocator);
+    dl_chunk* chunk = (dl_chunk*)&(dl_allocator->head);
+    chunk->head = init_size | DL_PINUSE_BIT;
+    size_t* footer = (size_t*)((char*)dl_allocator->end_addr - sizeof(size_t));
+    *footer = init_size;
+    
+    /* setup linked list of chunks */
+    dl_allocator->head.next = (struct cpl_dlist *)&(chunk->list);
+    chunk->list.prev = chunk->list.next = &(dl_allocator->head);
 }
 
 /*********************** Public Allocator routines  ***************************/

@@ -187,24 +187,30 @@ static void* cpl_dl_malloc(struct cpl_allocator* allocator, size_t sz)
     assert( dl_size(hole) >= chunksize);
     
     dl_remove_chunk(hole);
-    if(dl_size(hole) >= chunksize + DL_CHUNK_SIZE)
+    size_t new_size = dl_size(hole) - chunksize;
+    if(new_size < DL_CHUNK_SIZE)
     {
-        size_t new_size = dl_size(hole) - chunksize;
-        dl_chunk* new_chunk = dl_chunk_plus_offset(hole, chunksize);
-        new_chunk->head = new_size;
-        dl_insert_chunk(dl_allocator, new_chunk);
+        chunksize = dl_size(hole);
+        dl_chunk* next_chunk = dl_chunk_plus_offset(hole, chunksize);
+        if(&(next_chunk->head) != dl_allocator->end_addr)
+        {
+            next_chunk->head |= DL_PINUSE_BIT;
+        }
     }
     else
     {
-        chunksize = dl_size(hole);
+        
+        dl_chunk* next_chunk = dl_chunk_plus_offset(hole, chunksize);
+        if(&(next_chunk->head) != dl_allocator->end_addr)
+        {
+            next_chunk->head = new_size | DL_PINUSE_BIT;
+            dl_insert_chunk(dl_allocator, next_chunk);
+        }
     }
     
-    set_inuse(hole, chunksize);
+    hole->head = (hole->head & DL_PINUSE_BIT) | DL_CINUSE_BIT | chunksize;
     
     return chunk2ptr(hole);
-    
-_Lfailure:
-    return 0;
 }
 
 static void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* addr, size_t max_size)

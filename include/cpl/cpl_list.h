@@ -63,13 +63,42 @@ typedef struct cpl_dlist cpl_dlist_t;
 typedef struct cpl_dlist* cpl_dlist_ref;
 
 /**
- * Get the struct for this entry
+ * check whether the list is empty
+ */
+static inline int cpl_dlist_empty(struct cpl_dlist* head)
+{
+    return head->next == head;
+}
+
+static inline void __cpl_dlist_add(struct cpl_dlist* item,
+                                   struct cpl_dlist* prev,
+                                   struct cpl_dlist* next)
+{
+    next->prev = item;
+    item->next = next;
+    item->prev = prev;
+    prev->next = item;
+}
+
+static inline void cpl_dlist_add_tail(struct cpl_dlist *item, struct cpl_dlist* next)
+{
+    __cpl_dlist_add(item, next->prev, next);
+}
+
+static inline void cpl_dlist_del(struct cpl_dlist* item)
+{
+    item->prev->next = item->next;
+    item->next->prev = item->prev;
+}
+
+/**
+ * get the struct for the entry
  */
 #define cpl_dlist_entry(ptr, type, member) \
     ((type *)((char *)(ptr) - offsetof(type, member)))
 
 /**
- * Iterate over a list
+ * iterate over the list
  */
 #define cpl_dlist_foreach(pos, head) \
     for(pos = (head)->next; pos != (head); pos = pos->next)

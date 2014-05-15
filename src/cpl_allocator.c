@@ -145,7 +145,7 @@ static void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* a
     chunk->list.prev = chunk->list.next = &(dl_allocator->head);
 }
 
-static dl_chunk* find_smallest_chunk(struct cpl_dl_allocator* dl_allocator, size_t sz)
+static dl_chunk* dl_find_smallest_chunk(struct cpl_dl_allocator* dl_allocator, size_t sz)
 {
     dl_chunk* tmp = 0;
     struct cpl_dlist* iter;
@@ -164,6 +164,29 @@ static dl_chunk* find_smallest_chunk(struct cpl_dl_allocator* dl_allocator, size
     }
     
     return tmp;
+}
+
+static void dl_insert_chunk(struct cpl_dl_allocator* dl_allocator, dl_chunk* chunk)
+{
+    struct cpl_dlist* iter = &(dl_allocator->head);
+    if(!cpl_dlist_empty(iter))
+    {
+        size_t size = dl_size(chunk);
+        cpl_dlist_foreach(iter, &(dl_allocator->head))
+        {
+            dl_chunk* tmp = cpl_dlist_entry(iter, dl_chunk, list);
+            if(dl_size(tmp) >= size)
+            {
+                break;
+            }
+        }
+    }
+    cpl_dlist_add_tail(&(chunk->list), iter);
+}
+
+static void dl_remove_chunk(dl_chunk* chunk)
+{
+    cpl_dlist_del(&(chunk->list));
 }
 
 /*********************** Public Allocator routines  ***************************/

@@ -174,6 +174,26 @@ static void dl_remove_chunk(dl_chunk* chunk)
     cpl_dlist_del(&(chunk->list));
 }
 
+static int cpl_dl_expand(struct cpl_dl_allocator* dl_allocator, size_t new_size)
+{
+    assert(new_size > (char *)dl_allocator->start_addr - (char *)dl_allocator->end_addr);
+    if(new_size % 0x1000)
+    {
+        new_size &= 0x1000;
+        new_size += 0x1000;
+    }
+    
+    void* new_end_addr = (char *)dl_allocator->start_addr + new_size;
+    if(new_end_addr > dl_allocator->max_addr)
+    {
+        return 0;
+    }
+    
+    dl_allocator->end_addr = new_end_addr;
+    
+    return 1;
+}
+
 static void* cpl_dl_malloc(struct cpl_allocator* allocator, size_t sz)
 {
     struct cpl_dl_allocator* dl_allocator = (struct cpl_dl_allocator *)allocator;
@@ -182,9 +202,47 @@ static void* cpl_dl_malloc(struct cpl_allocator* allocator, size_t sz)
     dl_chunk *hole = dl_find_smallest_chunk(dl_allocator, chunksize);
     if(!hole)
     {
-        // TODO:
+        /* if we didn't find suitable hole, expand the heap */
+        size_t old_size = (char *)dl_allocator->end_addr - (char *)dl_allocator->start_addr;
+        void* old_end_addr = dl_allocator->end_addr;
+        int success = cpl_dl_expand(dl_allocator, old_size + chunksize);
+        if(!success)
+        {
+            return 0;
+        }
+        
+        size_t new_size = (char *)dl_allocator->end_addr - (char *)dl_allocator->start_addr;;
+        
+        /* Find endmost header */
+        struct cpl_dlist* tmp = 0;
+        if(!cpl_dlist_empty(&(dl_allocator->head)))
+        {
+            struct cpl_dlist* iter;
+            cpl_dlist_foreach(iter, &(dl_allocator->head))
+            {
+                if(iter > tmp)
+                {
+                    tmp = iter;
+                }
+            }
+        }
+        
+        dl_chunk* topchunk = cpl_dlist_entry(tmp, dl_chunk, list);
+        if(tmp && &(dl_chunk_plus_offset(topchunk, dl_size(topchunk))->head) == old_end_addr)
+        {
+            dl_remove_chunk(topchunk);
+            topchunk->head += new_size - old_size;
+        }
+        else
+        {
+            topchunk = (dl_chunk *)((char *)old_end_addr - sizeof(topchunk->prev_foot));
+            topchunk->head = DL_PINUSE_BIT | (new_size - old_size);
+        }
+        
+        dl_insert_chunk(dl_allocator, topchunk);
+        return cpl_dl_malloc(allocator, sz);
     }
-    assert( dl_size(hole) >= chunksize);
+    assert( dl_size(hole) >= chunksize );
     
     dl_remove_chunk(hole);
     size_t new_size = dl_size(hole) - chunksize;
@@ -213,8 +271,17 @@ static void* cpl_dl_malloc(struct cpl_allocator* allocator, size_t sz)
     return chunk2ptr(hole);
 }
 
+static void cpl_dl_free(struct cpl_allocator* allocator, void* ptr)
+{
+    
+}
+
 static void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* addr, size_t max_size)
 {
+    /* assign corresponding routines */
+    dl_allocator->xAllocate = cpl_dl_malloc;
+    dl_allocator->xFree = cpl_dl_free;
+    
     /* calculate initial size of the heap */
     size_t init_size = (max_size >= 0x10000)?0x10000:max_size;
     

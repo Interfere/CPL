@@ -106,24 +106,24 @@ static void cpl_pool_free(struct cpl_allocator* pAllocator, void* ptr)
 
 struct cpl_dl_allocator
 {
-    void*   (*xAllocate)(struct cpl_allocator*, size_t);
-    void    (*xFree)(struct cpl_allocator*, void* ptr);
+    void*       (*xAllocate)(struct cpl_allocator*, size_t);
+    void        (*xFree)(struct cpl_allocator*, void* ptr);
     /* The Heap */
-    void*   start_addr;
-    void*   end_addr;
-    void*   max_addr;
-    cpl_slist_ref head;
+    void*       start_addr;
+    void*       end_addr;
+    void*       max_addr;
+    cpl_dlist_t head;
 };
 
 struct dl_chunk
 {
-    size_t  prev_foot;
-    size_t  head;
-    struct cpl_slist list;
+    size_t      prev_foot;
+    size_t      head;
+    cpl_dlist_t list;
 };
 typedef struct dl_chunk dl_chunk;
 
-void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* addr, size_t max_size)
+static void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* addr, size_t max_size)
 {
     /* calculate initial size of the heap */
     size_t init_size = (max_size >= 0x10000)?0x10000:max_size;
@@ -141,8 +141,29 @@ void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* addr, si
     *footer = init_size;
     
     /* setup linked list of chunks */
-    dl_allocator->head = (struct cpl_slist*)&(chunk->list);
-    chunk->list.prev = chunk->list.next = dl_allocator->head;
+    dl_allocator->head.next = (struct cpl_dlist *)&(chunk->list);
+    chunk->list.prev = chunk->list.next = &(dl_allocator->head);
+}
+
+static dl_chunk* find_smallest_chunk(struct cpl_dl_allocator* dl_allocator, size_t sz)
+{
+    dl_chunk* tmp = 0;
+    struct cpl_dlist* iter;
+    cpl_dlist_foreach(iter, &(dl_allocator->head))
+    {
+        tmp = cpl_dlist_entry(iter, dl_chunk, list);
+        if(dl_size(tmp) >= sz)
+        {
+            break;
+        }
+    }
+    
+    if(iter == &(dl_allocator->head))
+    {
+        tmp = 0;
+    }
+    
+    return tmp;
 }
 
 /*********************** Public Allocator routines  ***************************/

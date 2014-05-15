@@ -30,7 +30,7 @@
 
 struct cpl_slist
 {
-    struct cpl_slist *next, *prev;
+    struct cpl_slist *next;
 };
 typedef struct cpl_slist cpl_slist_t;
 typedef struct cpl_slist* cpl_slist_ref;
@@ -54,5 +54,24 @@ cpl_slist_ref cpl_slist_pop(cpl_slist_ref __restrict list);
  * Remove first entry in the list.
  */
 void cpl_slist_del_first(cpl_slist_ref __restrict list);
+
+struct cpl_dlist
+{
+    struct cpl_dlist *next, *prev;
+};
+typedef struct cpl_dlist cpl_dlist_t;
+typedef struct cpl_dlist* cpl_dlist_ref;
+
+/**
+ * Get the struct for this entry
+ */
+#define cpl_dlist_entry(ptr, type, member) \
+    ((type *)((char *)(ptr) - offsetof(type, member)))
+
+/**
+ * Iterate over a list
+ */
+#define cpl_dlist_foreach(pos, head) \
+    for(pos = (head)->next; pos != (head); pos = pos->next)
 
 #endif // _CPL_LIST_H_

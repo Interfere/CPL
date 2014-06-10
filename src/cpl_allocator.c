@@ -87,7 +87,8 @@ static void cpl_pool_free(struct cpl_allocator* pAllocator, void* ptr)
 #define DL_FLAGS_MASK           (DL_INUSE_BITS | DL_RESERV_BIT)
 
 /* calculation helpers */
-#define dl_chunk_plus_offset(c, o) ((dl_chunk *)((char *)(c) + (o)))
+#define dl_chunk_plus_offset(c, o)  ((dl_chunk *)((char *)(c) + (o)))
+#define dl_chunk_minus_offset(c, o) ((dl_chunk *)((char *)(c) - (o)))
 
 /* flag getters */
 #define dl_pinuse(c)            ((c)->head & DL_PINUSE_BIT)
@@ -98,13 +99,14 @@ static void cpl_pool_free(struct cpl_allocator* pAllocator, void* ptr)
 #define clear_pinuse(c)         ((c)->head &= ~DL_PINUSE_BIT)
 #define set_inuse(c, s)         ((c)->head = dl_pinuse(c) | DL_CINUSE_BIT | (s)), \
                                 set_pinuse(dl_chunk_plus_offset(c, s))
-
 /* chunk sizes */
 #define DL_CHUNK_SIZE           (sizeof(struct dl_chunk))
 #define DL_CHUNK_OVERHEAD       (2 * sizeof(size_t))
 
 #define dl_pad_request(s)       (((s) + DL_CHUNK_OVERHEAD + DL_FLAGS_MASK) & ~DL_FLAGS_MASK)
 #define request2size(s)         ((s) < DL_CHUNK_SIZE ? DL_CHUNK_SIZE : dl_pad_request(s))
+#define ok_address(c, a)        (((size_t)(c) >= (size_t)(a)->start_addr) && \
+                                ((size_t)(c) < (size_t)(a)->end_addr))
 
 /* header <-> body */
 #define dl_size(c)              ((c)->head & ~(DL_FLAGS_MASK))
@@ -245,6 +247,7 @@ static void* cpl_dl_malloc(struct cpl_allocator* allocator, size_t sz)
     assert( dl_size(hole) >= chunksize );
     
     dl_remove_chunk(hole);
+
     size_t new_size = dl_size(hole) - chunksize;
     if(new_size < DL_CHUNK_SIZE)
     {
@@ -273,7 +276,82 @@ static void* cpl_dl_malloc(struct cpl_allocator* allocator, size_t sz)
 
 static void cpl_dl_free(struct cpl_allocator* allocator, void* ptr)
 {
+    struct cpl_dl_allocator* dl_allocator = (struct cpl_dl_allocator *)allocator;
+    if(ptr)
+    {
+        if(!ok_address(ptr, dl_allocator))
+        {
+            goto Lassert;
+        }
+        
+        // Find corresponding chunk
+        dl_chunk *chunk = ptr2chunk(ptr);
+        
+        if((chunk->head & DL_INUSE_BITS) == DL_PINUSE_BIT)
+        {
+            goto Lassert;
+        }
+        
+        size_t chunk_size = dl_size(chunk);
+        
+        // Check previous chunk. If inuse bit not set,
+        // then we can unify both free chunks
+        if(!dl_pinuse(chunk))
+        {
+            size_t left_size = chunk->prev_foot;
+            dl_chunk *left_chunk = dl_chunk_minus_offset(chunk, left_size);
+            
+            if(!ok_address(left_chunk, dl_allocator))
+            {
+                goto Lassert;
+            }
+            
+            chunk_size += left_size;
+            chunk = left_chunk;
+            
+            // Remove chunk from ordered list
+            dl_remove_chunk(chunk);
+        }
+        
+        // Find addres of next chunk
+        dl_chunk *right_chunk = dl_chunk_plus_offset(chunk, chunk_size);
+        if(ok_address(&right_chunk->head, dl_allocator))
+        {
+            if(!dl_pinuse(right_chunk))
+            {
+                goto Lassert;
+            }
+            
+            // check whether right chunk is inuse
+            if(dl_cinuse(right_chunk))
+            {
+                // Clear PINUSE
+                clear_pinuse(right_chunk);
+            }
+            else
+            {
+                size_t right_size = dl_size(right_chunk);
+                
+                if((size_t)dl_chunk_plus_offset(right_chunk, right_size) > (size_t)dl_allocator->end_addr)
+                {
+                    goto Lassert;
+                }
+                
+                dl_remove_chunk(right_chunk);
+                chunk_size += right_size;
+            }
+        }
+        
+        dl_chunk_plus_offset(chunk, chunk_size)->prev_foot = chunk_size;
+        chunk->head = chunk_size | DL_INUSE_BITS;
+        
+        dl_insert_chunk(dl_allocator, chunk);
+    }
     
+    return ;
+    
+Lassert:
+    assert(0);
 }
 
 static void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* addr, size_t max_size)
@@ -286,19 +364,20 @@ static void cpl_dl_allocator_init(struct cpl_dl_allocator* dl_allocator, char* a
     size_t init_size = (max_size >= 0x10000)?0x10000:max_size;
     
     /* setup allocator */
-    dl_allocator->start_addr = addr;
+    size_t off = (sizeof(struct cpl_dl_allocator) - sizeof(size_t) + DL_FLAGS_MASK) & ~(DL_FLAGS_MASK);
+    dl_allocator->start_addr = addr + off;
     dl_allocator->end_addr = addr + init_size;
     dl_allocator->max_addr = addr + max_size;
     
     /* setup initial chunk */
-    init_size -= sizeof(struct cpl_dl_allocator);
-    dl_chunk* chunk = (dl_chunk*)&(dl_allocator->head);
+    init_size -= off;
+    dl_chunk* chunk = (dl_chunk*)dl_allocator->start_addr;
     chunk->head = init_size | DL_PINUSE_BIT;
     size_t* footer = (size_t*)((char*)dl_allocator->end_addr - sizeof(size_t));
     *footer = init_size;
     
     /* setup linked list of chunks */
-    dl_allocator->head.next = (struct cpl_dlist *)&(chunk->list);
+    dl_allocator->head.prev = dl_allocator->head.next = (struct cpl_dlist *)&(chunk->list);
     chunk->list.prev = chunk->list.next = &(dl_allocator->head);
 }
 
@@ -386,6 +465,6 @@ void cpl_allocator_destroy_dl(cpl_allocator_ref allocator)
     assert(allocator != cpl_allocator_get_default());
     struct cpl_dl_allocator* dl_allocator = (struct cpl_dl_allocator *)allocator;
     size_t max_size = (char*)dl_allocator->max_addr - (char*)dl_allocator->start_addr;
-    int rc = munmap(dl_allocator->start_addr, max_size);
+    int rc = munmap(dl_allocator, max_size);
     assert(rc == 0);
 }

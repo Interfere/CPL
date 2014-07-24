@@ -29,18 +29,20 @@
 #define _CPL_REGION_H_
 
 #include <stdlib.h>
+#include <cpl/cpl_allocator.h>
 
 typedef struct cpl_region cpl_region_t;
 typedef struct cpl_region* cpl_region_ref;
 struct cpl_region
 {
+    cpl_allocator_ref allocator;
     size_t      alloc;
     size_t      offset;
     void        *data;
 };
 
-cpl_region_ref cpl_region_create(size_t sz);
-int cpl_region_init(cpl_region_ref __restrict r, size_t sz);
+cpl_region_ref cpl_region_create(cpl_allocator_ref allocator, size_t sz);
+int cpl_region_init(cpl_allocator_ref allocator, cpl_region_ref __restrict r, size_t sz);
 
 #define cpl_region_create_default() cpl_region_create(0)
 

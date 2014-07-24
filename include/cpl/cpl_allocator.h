@@ -59,4 +59,6 @@ void cpl_allocator_destroy_dl(cpl_allocator_ref);
 void* cpl_allocator_allocate(cpl_allocator_ref, size_t);
 void cpl_allocator_free(cpl_allocator_ref, void*);
 
+void* cpl_allocator_realloc(cpl_allocator_ref, void*, size_t);
+
 #endif // _CPL_ALLOCATOR_H_

@@ -31,7 +31,7 @@ cpl_array_ref cpl_array_create(size_t sz, size_t nreserv)
     {
         a->szelem = sz;
         a->count = 0;
-        int res = cpl_region_init(&a->region, sz * nreserv);
+        int res = cpl_region_init(cpl_allocator_get_default(), &a->region, sz * nreserv);
         if(res != _CPL_OK)
         {
             free(a);
@@ -43,7 +43,7 @@ cpl_array_ref cpl_array_create(size_t sz, size_t nreserv)
 
 int cpl_array_init(cpl_array_ref a, size_t sz, size_t nreserv)
 {
-    int res = cpl_region_init(&a->region, sz * nreserv);
+    int res = cpl_region_init(cpl_allocator_get_default(), &a->region, sz * nreserv);
     if(res == _CPL_OK)
     {
         a->szelem = sz;

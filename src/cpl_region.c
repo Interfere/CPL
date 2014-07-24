@@ -53,21 +53,21 @@ static inline int _cpl_resize_up(cpl_region_ref __restrict r, size_t sz)
     return _CPL_OK;
 }
 
-cpl_region_ref cpl_region_create(size_t sz)
+cpl_region_ref cpl_region_create(cpl_allocator_ref allocator, size_t sz)
 {
-    cpl_region_ref r = (cpl_region_ref)malloc(sizeof(cpl_region_t));
+    cpl_region_ref r = (cpl_region_ref)cpl_allocator_allocate(allocator, sizeof(cpl_region_t));
     if(r)
     {
-        if(cpl_region_init(r, sz))
+        if(cpl_region_init(allocator, r, sz))
         {
-            free(r);
+            cpl_allocator_free(allocator, r);
             r = 0;
         }
     }
     return r;
 }
 
-int cpl_region_init(cpl_region_ref __restrict r, size_t sz)
+int cpl_region_init(cpl_allocator_ref allocator, cpl_region_ref __restrict r, size_t sz)
 {
     assert(r);
     if(sz > 64)
@@ -79,9 +79,10 @@ int cpl_region_init(cpl_region_ref __restrict r, size_t sz)
         sz = 64;
     }
     
+    r->allocator = allocator;
     r->alloc = sz;
     r->offset = 0;
-    r->data = malloc(sz);
+    r->data = cpl_allocator_allocate(allocator, sz);
     if(!r->data)
     {
         return _CPL_NOMEM;

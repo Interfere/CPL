@@ -43,7 +43,7 @@ static size_t _cpl_p2(size_t in)
 static inline int _cpl_resize_up(cpl_region_ref __restrict r, size_t sz)
 {
     size_t alloc = _cpl_p2(sz);
-    void *ptr = realloc(r->data, alloc);
+    void *ptr = cpl_allocator_realloc(r->allocator, r->data, alloc);
     if(!ptr)
     {
         return _CPL_NOMEM;
@@ -121,7 +121,7 @@ int cpl_region_append_data(cpl_region_ref __restrict r, const void* __restrict d
 int cpl_region_resize(cpl_region_ref __restrict r, size_t sz)
 {
     size_t alloc = _cpl_p2(sz);
-    void *ptr = realloc(r->data, alloc);
+    void *ptr = cpl_allocator_realloc(r->allocator, r->data, alloc);
     if(!ptr)
     {
         return _CPL_NOMEM;

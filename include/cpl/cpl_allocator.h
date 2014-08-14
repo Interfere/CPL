@@ -36,6 +36,13 @@
 typedef struct cpl_allocator* cpl_allocator_ref;
 
 /**
+ * Alloc() and Free() routines that encapsulates allocator-related internals.
+ */
+void* cpl_allocator_allocate(cpl_allocator_ref, size_t);
+void cpl_allocator_free(cpl_allocator_ref, void*);
+void* cpl_allocator_realloc(cpl_allocator_ref, void*, size_t);
+
+/**
  * Default allocator accessor. Represents basic allocation routines, such as
  * malloc() and free().
  */
@@ -52,13 +59,5 @@ void cpl_allocator_destroy_pool(cpl_allocator_ref);
  */
 cpl_allocator_ref cpl_allocator_create_dl(size_t max_size);
 void cpl_allocator_destroy_dl(cpl_allocator_ref);
-
-/**
- * Alloc() and Free() routines that encapsulates allocator-related internals.
- */
-void* cpl_allocator_allocate(cpl_allocator_ref, size_t);
-void cpl_allocator_free(cpl_allocator_ref, void*);
-
-void* cpl_allocator_realloc(cpl_allocator_ref, void*, size_t);
 
 #endif // _CPL_ALLOCATOR_H_

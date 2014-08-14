@@ -15,7 +15,28 @@
 		71F455091875DCF600FCBA58 /* cpl_atomic_osx.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F454F61875DBD400FCBA58 /* cpl_atomic_osx.c */; };
 		71F4550A1875DCF600FCBA58 /* cpl_random_osx.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F454F71875DBD400FCBA58 /* cpl_random_osx.c */; };
 		71F4550B1875DCF600FCBA58 /* cpl_region.c in Sources */ = {isa = PBXBuildFile; fileRef = 71F454F81875DBD400FCBA58 /* cpl_region.c */; };
+		767C3118199CECAA00EBC481 /* cpl_allocator_dl.c in Sources */ = {isa = PBXBuildFile; fileRef = 767C3114199CECAA00EBC481 /* cpl_allocator_dl.c */; };
+		767C3119199CECAA00EBC481 /* cpl_allocator_dl.c in Sources */ = {isa = PBXBuildFile; fileRef = 767C3114199CECAA00EBC481 /* cpl_allocator_dl.c */; };
+		767C311A199CECAA00EBC481 /* cpl_allocator_pool.c in Sources */ = {isa = PBXBuildFile; fileRef = 767C3115199CECAA00EBC481 /* cpl_allocator_pool.c */; };
+		767C311B199CECAA00EBC481 /* cpl_allocator_pool.c in Sources */ = {isa = PBXBuildFile; fileRef = 767C3115199CECAA00EBC481 /* cpl_allocator_pool.c */; };
+		767C311C199CECAA00EBC481 /* cpl_allocator.c in Sources */ = {isa = PBXBuildFile; fileRef = 767C3116199CECAA00EBC481 /* cpl_allocator.c */; };
+		767C311D199CECAA00EBC481 /* cpl_allocator.c in Sources */ = {isa = PBXBuildFile; fileRef = 767C3116199CECAA00EBC481 /* cpl_allocator.c */; };
+		767C311E199CECAA00EBC481 /* cpl_list.c in Sources */ = {isa = PBXBuildFile; fileRef = 767C3117199CECAA00EBC481 /* cpl_list.c */; };
+		767C311F199CECAA00EBC481 /* cpl_list.c in Sources */ = {isa = PBXBuildFile; fileRef = 767C3117199CECAA00EBC481 /* cpl_list.c */; };
+		767C3130199CF22700EBC481 /* check_cpl_allocator.c in Sources */ = {isa = PBXBuildFile; fileRef = 767C3121199CF0B400EBC481 /* check_cpl_allocator.c */; };
+		767C3132199CF29900EBC481 /* libcheck.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 767C3131199CF29900EBC481 /* libcheck.dylib */; };
+		767C3136199CF39200EBC481 /* libcpl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F454FD1875DC5C00FCBA58 /* libcpl.a */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		767C3134199CF38B00EBC481 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 71F454E81875DB9E00FCBA58 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71F454FC1875DC5C00FCBA58;
+			remoteInfo = cpl;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		71F454EF1875DBD400FCBA58 /* cpl_array.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_array.h; sourceTree = "<group>"; };
@@ -29,7 +50,28 @@
 		71F454F81875DBD400FCBA58 /* cpl_region.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cpl_region.c; sourceTree = "<group>"; };
 		71F454FD1875DC5C00FCBA58 /* libcpl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcpl.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		71F4550F1875DCF600FCBA58 /* libcpl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcpl.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		767C3112199CEC9C00EBC481 /* cpl_allocator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_allocator.h; sourceTree = "<group>"; };
+		767C3113199CEC9C00EBC481 /* cpl_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cpl_list.h; sourceTree = "<group>"; };
+		767C3114199CECAA00EBC481 /* cpl_allocator_dl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_allocator_dl.c; sourceTree = "<group>"; };
+		767C3115199CECAA00EBC481 /* cpl_allocator_pool.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_allocator_pool.c; sourceTree = "<group>"; };
+		767C3116199CECAA00EBC481 /* cpl_allocator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_allocator.c; sourceTree = "<group>"; };
+		767C3117199CECAA00EBC481 /* cpl_list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpl_list.c; sourceTree = "<group>"; };
+		767C3121199CF0B400EBC481 /* check_cpl_allocator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = check_cpl_allocator.c; sourceTree = "<group>"; };
+		767C3127199CF21000EBC481 /* check_cpl_allocator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = check_cpl_allocator; sourceTree = BUILT_PRODUCTS_DIR; };
+		767C3131199CF29900EBC481 /* libcheck.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcheck.dylib; path = /usr/local/Cellar/check/0.9.13/lib/libcheck.dylib; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		767C3124199CF21000EBC481 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				767C3136199CF39200EBC481 /* libcpl.a in Frameworks */,
+				767C3132199CF29900EBC481 /* libcheck.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		71F454E71875DB9E00FCBA58 = {
@@ -37,6 +79,7 @@
 			children = (
 				71F454EE1875DBD400FCBA58 /* include */,
 				71F454F41875DBD400FCBA58 /* src */,
+				767C3120199CEEFB00EBC481 /* tests */,
 				71F454FE1875DC5C00FCBA58 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -44,9 +87,11 @@
 		71F454EE1875DBD400FCBA58 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				767C3112199CEC9C00EBC481 /* cpl_allocator.h */,
 				71F454EF1875DBD400FCBA58 /* cpl_array.h */,
 				71F454F01875DBD400FCBA58 /* cpl_atomic.h */,
 				71F454F11875DBD400FCBA58 /* cpl_error.h */,
+				767C3113199CEC9C00EBC481 /* cpl_list.h */,
 				71F454F21875DBD400FCBA58 /* cpl_random.h */,
 				71F454F31875DBD400FCBA58 /* cpl_region.h */,
 			);
@@ -57,8 +102,12 @@
 		71F454F41875DBD400FCBA58 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				767C3116199CECAA00EBC481 /* cpl_allocator.c */,
+				767C3114199CECAA00EBC481 /* cpl_allocator_dl.c */,
+				767C3115199CECAA00EBC481 /* cpl_allocator_pool.c */,
 				71F454F51875DBD400FCBA58 /* cpl_array.c */,
 				71F454F61875DBD400FCBA58 /* cpl_atomic_osx.c */,
+				767C3117199CECAA00EBC481 /* cpl_list.c */,
 				71F454F71875DBD400FCBA58 /* cpl_random_osx.c */,
 				71F454F81875DBD400FCBA58 /* cpl_region.c */,
 			);
@@ -71,8 +120,19 @@
 			children = (
 				71F454FD1875DC5C00FCBA58 /* libcpl.a */,
 				71F4550F1875DCF600FCBA58 /* libcpl.a */,
+				767C3127199CF21000EBC481 /* check_cpl_allocator */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		767C3120199CEEFB00EBC481 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				767C3131199CF29900EBC481 /* libcheck.dylib */,
+				767C3121199CF0B400EBC481 /* check_cpl_allocator.c */,
+			);
+			name = tests;
+			path = ../tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -108,13 +168,30 @@
 			productReference = 71F4550F1875DCF600FCBA58 /* libcpl.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		767C3126199CF21000EBC481 /* check_cpl_allocator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 767C312D199CF21000EBC481 /* Build configuration list for PBXNativeTarget "check_cpl_allocator" */;
+			buildPhases = (
+				767C3123199CF21000EBC481 /* Sources */,
+				767C3124199CF21000EBC481 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				767C3135199CF38B00EBC481 /* PBXTargetDependency */,
+			);
+			name = check_cpl_allocator;
+			productName = check_cpl_allocator;
+			productReference = 767C3127199CF21000EBC481 /* check_cpl_allocator */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		71F454E81875DB9E00FCBA58 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0510;
 			};
 			buildConfigurationList = 71F454EB1875DB9E00FCBA58 /* Build configuration list for PBXProject "CPL" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -130,6 +207,7 @@
 			targets = (
 				71F454FC1875DC5C00FCBA58 /* cpl */,
 				71F455061875DCF600FCBA58 /* cpl_ios */,
+				767C3126199CF21000EBC481 /* check_cpl_allocator */,
 			);
 		};
 /* End PBXProject section */
@@ -140,9 +218,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				71F455021875DC7800FCBA58 /* cpl_array.c in Sources */,
+				767C3118199CECAA00EBC481 /* cpl_allocator_dl.c in Sources */,
+				767C311C199CECAA00EBC481 /* cpl_allocator.c in Sources */,
 				71F455031875DC7800FCBA58 /* cpl_atomic_osx.c in Sources */,
 				71F455041875DC7800FCBA58 /* cpl_random_osx.c in Sources */,
+				767C311E199CECAA00EBC481 /* cpl_list.c in Sources */,
 				71F455051875DC7800FCBA58 /* cpl_region.c in Sources */,
+				767C311A199CECAA00EBC481 /* cpl_allocator_pool.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,13 +233,33 @@
 			buildActionMask = 2147483647;
 			files = (
 				71F455081875DCF600FCBA58 /* cpl_array.c in Sources */,
+				767C3119199CECAA00EBC481 /* cpl_allocator_dl.c in Sources */,
+				767C311D199CECAA00EBC481 /* cpl_allocator.c in Sources */,
 				71F455091875DCF600FCBA58 /* cpl_atomic_osx.c in Sources */,
 				71F4550A1875DCF600FCBA58 /* cpl_random_osx.c in Sources */,
+				767C311F199CECAA00EBC481 /* cpl_list.c in Sources */,
 				71F4550B1875DCF600FCBA58 /* cpl_region.c in Sources */,
+				767C311B199CECAA00EBC481 /* cpl_allocator_pool.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		767C3123199CF21000EBC481 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				767C3130199CF22700EBC481 /* check_cpl_allocator.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		767C3135199CF38B00EBC481 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 71F454FC1875DC5C00FCBA58 /* cpl */;
+			targetProxy = 767C3134199CF38B00EBC481 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		71F454EC1875DB9E00FCBA58 /* Debug */ = {
@@ -176,6 +278,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -215,6 +318,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -318,6 +422,98 @@
 			};
 			name = Release;
 		};
+		767C312E199CF21000EBC481 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/check/0.9.13/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		767C312F199CF21000EBC481 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/Cellar/check/0.9.13/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -347,6 +543,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		767C312D199CF21000EBC481 /* Build configuration list for PBXNativeTarget "check_cpl_allocator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				767C312E199CF21000EBC481 /* Debug */,
+				767C312F199CF21000EBC481 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

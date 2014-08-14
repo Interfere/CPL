@@ -26,9 +26,71 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <check.h>
 #include "../include/cpl/cpl_allocator.h"
 
+#define SMALLSIZE   72
+#define MEDIUMSIZE  896
+#define BIGSIZE     16384
+#define HUGESIZE    ((size_t)-1)
+
+/****************************** Usefule Routines ******************************/
+static void markblock(volatile void *ptr, size_t size, unsigned bias, int doprint)
+{
+    size_t n, i;
+    unsigned long *pl;
+    unsigned long val;
+    
+    pl = (unsigned long *)ptr;
+    n = size / sizeof(unsigned long);
+    
+    for (i = 0; i < n; i++)
+    {
+        val = (unsigned long)i ^ (unsigned long)bias;
+        pl[i] = val;
+        if(doprint && (i%64 == 63))
+        {
+            printf(".");
+        }
+    }
+    if(doprint)
+    {
+        printf("\n");
+    }
+}
+
+static int checkblock(volatile void *ptr, size_t size, unsigned bias, int doprint)
+{
+    size_t n, i;
+    unsigned long *pl;
+    unsigned long val;
+    
+    pl = (unsigned long *)ptr;
+    n = size / sizeof(unsigned long);
+    
+    for (i = 0; i < n; i++)
+    {
+        val = (unsigned long)i ^ (unsigned long)bias;
+        if(pl[i] != val)
+        {
+            ck_assert_msg(0, "data mismatch at offset %lu of block at %p: %lu vs. %lu",
+                          (unsigned long)(i * sizeof(unsigned long)), pl, pl[i], val);
+            return 0;
+        }
+        if(doprint && (i%64 == 63))
+        {
+            printf(".");
+        }
+    }
+    if(doprint)
+    {
+        printf("\n");
+    }
+    return 1;
+}
+
+/************************************ Tests ***********************************/
 START_TEST(test_cpl_allocator_get_default)
 {
     cpl_allocator_ref a;
@@ -38,13 +100,55 @@ START_TEST(test_cpl_allocator_get_default)
 }
 END_TEST
 
+START_TEST(test_default_allocator_test1)
+{
+    volatile void *x;
+    
+    x = malloc(BIGSIZE);
+    ck_assert_ptr_ne((void *)x, 0);
+    
+    markblock(x, BIGSIZE, 0, 0);
+    ck_assert(checkblock(x, BIGSIZE, 0, 0));
+    
+    free((void *)x);
+}
+END_TEST
+
+START_TEST(test_default_allocator_test2)
+{
+    volatile void *x;
+    size_t size;
+    
+    for(size = HUGESIZE; (x = malloc(size)) == 0; size = size/2)
+    {
+        printf("%9lu bytes failed\n", (unsigned long)size);
+    }
+    printf("%9lu bytes succeeded\n", (unsigned long)size);
+    
+    markblock(x, size, 0, 1);
+    ck_assert(checkblock(x, size, 0, 1));
+    
+    free((void*)x);
+    
+    x = malloc(size);
+    ck_assert_ptr_ne((void *)x, 0);
+    free((void*)x);
+}
+END_TEST
+
+
+/************************************ Suits ***********************************/
 static Suite* cpl_allocator_suit(void)
 {
     Suite* s = suite_create("Allocator");
     
     /* Default Allocator test case */
     TCase* tc_def = tcase_create("Default Allocator");
+    tcase_set_timeout(tc_def, 4000);
+    
     tcase_add_test(tc_def, test_cpl_allocator_get_default);
+    tcase_add_test(tc_def, test_default_allocator_test1);
+    tcase_add_test(tc_def, test_default_allocator_test2);
     
     suite_add_tcase(s, tc_def);
     

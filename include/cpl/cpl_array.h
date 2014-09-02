@@ -103,7 +103,7 @@ int cpl_array_push_back_p(cpl_array_ref a, void* p, size_t sz);
 /*
  * Delete last element.
  */
-#define cpl_array_pop_back(a)           ((a)->count-=1)
+void cpl_array_pop_back(cpl_array_ref __restrict a);
 
 /*
  * Access last element.

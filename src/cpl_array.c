@@ -93,6 +93,15 @@ void cpl_array_clear(cpl_array_ref __restrict a)
     a->region.offset = 0;
 }
 
+void cpl_array_pop_back(cpl_array_ref __restrict a)
+{
+    if(a->count > 0)
+    {
+        a->region.offset -= a->szelem;
+        a->count -= 1;
+    }
+}
+
 void* cpl_array_back_p(cpl_array_ref __restrict a)
 {
     return cpl_array_get_p(a, cpl_array_count(a)-1);
